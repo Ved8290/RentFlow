@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import './Dashboard.css';
-import { getRenters  , deleteRenters , markAPaid } from './API/Renter';
-import { Route } from 'react-router-dom';
+// @ts-ignore
+import { getRenters, deleteRenters, markAPaid } from './API/Renter';
 import { useNavigate } from "react-router-dom";
 
 
@@ -17,7 +17,7 @@ interface Renter {
   dueDay: number;
   status: Status;
   daysLate?: number;
-  daysUntilDue?: number; // NEW: for upcoming label
+  daysUntilDue?: number;
   init: string;
   bg: string;
   fg: string;
@@ -36,7 +36,6 @@ const SEED: Renter[] = [
 ];
 
 // ─── STATUS LABEL HELPER ─────────────────────
-// Returns a rich label string based on status, daysLate, and daysUntilDue
 const getStatusLabel = (r: Renter): string => {
   switch (r.status) {
     case 'paid':
@@ -121,17 +120,12 @@ const Dashboard: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
   const [time, setTime]         = useState('');
   const [greetingText, setGreetingText] = useState('');
-  const [activeTab,setActiveTab]=useState(1);
   const navigate = useNavigate();
 
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const PER  = 6;
   const ROOT = import.meta.env.VITE_API_URL;
-
-  // ─── TEMPORARY cron POST endpoint (replace later) ─
-  // This matches the cron job server — swap this URL when you deploy
-  const CRON_UPDATE_URL = `${ROOT}/api/cron/update-statuses`;
 
   // ── Derived stats ─────────────────────────
   const paid      = renters.filter(r => r.status === 'paid');
@@ -225,24 +219,23 @@ const Dashboard: React.FC = () => {
   const markPaid = async (id: number | string, name: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setRenters(rs => rs.map(r =>
-      r.id === id ? { ...r, status: 'paid', daysLate: undefined, daysUntilDue: undefined } : r
+      r.id === id ? { ...r, status: 'paid' as Status, daysLate: undefined, daysUntilDue: undefined } : r
     ));
-   await markAPaid(id);
+    await markAPaid(id);
     pop(`${name} marked as paid ✓`);
   };
 
   // ── Delete renter ─────────────────────────
-  const deleteRenter = async(id: number | string, name: string, e: React.MouseEvent) => {
+  const deleteRenter = async (id: number | string, name: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setRenters(rs => rs.filter(r => r.id !== id));
-    const d=await deleteRenters(id);
+    const d = await deleteRenters(id);
     console.log(d);
-    
     pop(`${name} removed`, 'err');
   };
 
   // ── Generate initials ─────────────────────
-  const getInitials = (name?: string) => {
+  const getInitials = (name?: string): string => {
     if (!name) return '';
     const words = name.trim().split(' ');
     if (words.length === 1) return words[0][0].toUpperCase();
@@ -252,12 +245,12 @@ const Dashboard: React.FC = () => {
   // ── Add renter API call ───────────────────
   const saveNewRenter = async () => {
     const payload = {
-      name:       form.name,
-      email:      form.email,
-      mobaile:    form.phone,
-      rent:       Number(form.amount),
-      day:        Number(form.dueDay),
-      ownerID:    userData?.email,
+      name:    form.name,
+      email:   form.email,
+      mobaile: form.phone,
+      rent:    Number(form.amount),
+      day:     Number(form.dueDay),
+      ownerID: userData?.email,
     };
     const res = await fetch(`${ROOT}/api/add/newrenter`, {
       method:  'POST',
@@ -268,41 +261,36 @@ const Dashboard: React.FC = () => {
     return await res.json();
   };
 
- const addRenter = async () => {
+  const addRenter = async () => {
+    if (!form.name || !form.phone || !form.amount) {
+      pop('Please fill all required fields', 'err');
+      return;
+    }
 
-  if (!form.name || !form.phone || !form.amount) {
-    pop('Please fill all required fields', 'err');
-    return;
-  }
+    if (form.phone.length !== 10) {
+      pop('Invalid Mobile Number', 'err');
+      return;
+    }
 
-  if (form.phone.length !== 10) {
-    pop('Invalid Mobile Number', 'err');
-    return;
-  }
+    const isValidEmail = (email: string): boolean =>
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const isValidEmail = (email) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!isValidEmail(form.email)) {
+      pop('Invalid email format', 'err');
+      return;
+    }
+
+    try {
+      await saveNewRenter();
+      pop('Renter added successfully', 'ok');
+      setModal(false);
+      setForm(EMPTY);
+      fetchRenters();
+    } catch (err) {
+      console.error(err);
+      pop('Error adding renter. Please try again.', 'err');
+    }
   };
-
-  if (!isValidEmail(form.email)) {
-  pop('Invalid email format', 'err');
-  return;
-}   
-
-
-  try {
-    await saveNewRenter();
-
-    pop('Renter added successfully', 'ok');
-    setModal(false);
-    setForm(EMPTY);
-    fetchRenters();
-
-  } catch (err) {
-    console.error(err);
-    pop('Error adding renter. Please try again.', 'err');
-  }
-};
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -313,6 +301,11 @@ const Dashboard: React.FC = () => {
     setFilter(f);
     setCurPage(1);
   };
+
+  // Suppress unused-variable warnings for markPaid / deleteRenter
+  // by referencing them — they are used in commented-out JSX below
+  void markPaid;
+  void deleteRenter;
 
   return (
     <div className="shell">
@@ -342,11 +335,11 @@ const Dashboard: React.FC = () => {
 
         <div className="nav-group">
           <div className="nav-group-label">Account</div>
-          <button className="nav-item" onClick={() => setActiveTab(6)}>
+          <button className="nav-item" onClick={() => setPage('settings')}>
             <span className="nav-item-icon">⚙️</span>
             <span className="nav-item-label">Settings</span>
           </button>
-          <button className="nav-item" onClick={() => { localStorage.removeItem("user"); localStorage.removeItem("token"); window.location.href = '/login' } }>
+          <button className="nav-item" onClick={() => { localStorage.removeItem("user"); localStorage.removeItem("token"); window.location.href = '/login'; }}>
             <span className="nav-item-icon">🚪</span>
             <span className="nav-item-label">Log out</span>
           </button>
@@ -479,9 +472,7 @@ const Dashboard: React.FC = () => {
                   <div className="av" style={{ background: r.bg || '#dbeafe', color: r.fg || '#1d4ed8' }}>
                     {r.init || getInitials(r.name)}
                   </div>
-                  <div className="renter-info" onClick={()=>{
-                    navigate(`/Dashboard/renter/${r.id}`);
-                  }}>
+                  <div className="renter-info" onClick={() => { navigate(`/Dashboard/renter/${r.id}`); }}>
                     <div className="renter-name">{r.name}</div>
                     <div className="renter-meta">{r.flat} · {r.phone}</div>
                   </div>
@@ -494,19 +485,21 @@ const Dashboard: React.FC = () => {
 
                   {/* ── RICH STATUS BADGE ── */}
                   <span className={`badge ${r.status}`}>
-                    {r.status === 'paid'     && <CheckIcon />}
-                    {r.status === 'overdue'  && <span className="badge-dot pulse" />}
-                    {r.status === 'due'      && <span className="badge-dot blink" />}
+                    {r.status === 'paid'    && <CheckIcon />}
+                    {r.status === 'overdue' && <span className="badge-dot pulse" />}
+                    {r.status === 'due'     && <span className="badge-dot blink" />}
                     {getStatusLabel(r)}
                   </span>
 
-                  {/* <div className="row-actions">
+                  {/* Uncomment to re-enable row actions:
+                  <div className="row-actions">
                     {r.status !== 'paid' && (
                       <button className="act-btn" title="Mark as paid" onClick={e => markPaid(r.id, r.name, e)}>✓</button>
                     )}
                     <button className="act-btn" title="WhatsApp" onClick={e => { e.stopPropagation(); pop(`Reminder sent to ${r.name} via WhatsApp 💬`); }}>💬</button>
                     <button className="act-btn del" title="Remove" onClick={e => deleteRenter(r.id, r.name, e)}>🗑</button>
-                  </div> */}
+                  </div>
+                  */}
                 </div>
               ))}
 
@@ -598,16 +591,13 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="modal-body">
-            
-              <div className="field">
-                <label className="lbl">Full name *</label>
-                <div className="inp-wrap">
-                  <span className="inp-ico">👤</span>
-                  <input placeholder="e.g. Rahul Kumar" value={form.name}
-                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-                </div>
-             
-             
+            <div className="field">
+              <label className="lbl">Full name *</label>
+              <div className="inp-wrap">
+                <span className="inp-ico">👤</span>
+                <input placeholder="e.g. Rahul Kumar" value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+              </div>
             </div>
 
             <div className="field">
