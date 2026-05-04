@@ -429,13 +429,16 @@ export default function RenterDetail({
     : "paid";
 
   const handlePayRentClick = () => {
-    const target = overdueList[0] ?? dueList[0];
-    // if (!target) {
-    //   showToast("No pending payments", "error");
-    //   return;
-    // }
-    setEditing("0");
+  const blankPayment: Payment = {
+    id: "",
+    month: new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" }),
+    dueDate: new Date().toISOString().split("T")[0],
+    paidDate: null,
+    amount: display.rent,
+    status: "due",
   };
+  setEditing(blankPayment);
+};
 
   return (
     <div className="rd-root">
