@@ -472,7 +472,7 @@ const Dashboard: React.FC = () => {
                   <div className="av" style={{ background: r.bg || '#dbeafe', color: r.fg || '#1d4ed8' }}>
                     {r.init || getInitials(r.name)}
                   </div>
-                  <div className="renter-info" onClick={() => { navigate(`/Dashboard/renter/${r.id}`); }}>
+                  <div className="renter-info" onClick={() => { navigate(`/Dashboard/renter/${r.id}/${userData?.email}`); }}>
                     <div className="renter-name">{r.name}</div>
                     <div className="renter-meta">{r.flat} · {r.phone}</div>
                   </div>
@@ -481,6 +481,7 @@ const Dashboard: React.FC = () => {
                     <div className="renter-due">
                       Due {r.dueDay}{r.dueDay === 1 ? 'st' : r.dueDay === 2 ? 'nd' : r.dueDay === 3 ? 'rd' : 'th'}
                     </div>
+                    
                   </div>
 
                   {/* ── RICH STATUS BADGE ── */}
@@ -499,7 +500,9 @@ const Dashboard: React.FC = () => {
                     <button className="act-btn" title="WhatsApp" onClick={e => { e.stopPropagation(); pop(`Reminder sent to ${r.name} via WhatsApp 💬`); }}>💬</button>
                     <button className="act-btn del" title="Remove" onClick={e => deleteRenter(r.id, r.name, e)}>🗑</button>
                   </div>
-                  */}
+                  */
+                  <button className="act-btn del" title="Remove" onClick={e => deleteRenter(r.id, r.name, e)}>🗑</button>
+                  }
                 </div>
               ))}
 

@@ -1,7 +1,90 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./LandingPage.css";
+import { Helmet } from "react-helmet-async";
 
 const NAV_LINKS = ["Home", "Features", "How It Works", "Benefits"];
+
+// ── SEO Component ────────────────────────────────────────────
+function SEO() {
+  return (
+    <Helmet>
+      {/* ── Basic ── */}
+      <title>RentFlow — Smart Rent Collection & Automated Email Reminders</title>
+      <meta
+        name="description"
+        content="RentFlow helps landlords automate rent reminders, track payments, and manage tenants from one powerful dashboard. Trusted by 3,000+ property managers."
+      />
+      <meta
+        name="keywords"
+        content="rent collection, rent reminder, property management, tenant management, automated rent, landlord software, rent tracking"
+      />
+      <meta name="author" content="RentFlow Inc." />
+      <meta name="robots" content="index, follow" />
+      <link rel="canonical" href="https://rentflow.app/" />
+ 
+      {/* ── Open Graph (Facebook, LinkedIn, WhatsApp) ── */}
+      <meta property="og:type" content="website" />
+      <meta property="og:site_name" content="RentFlow" />
+      <meta
+        property="og:title"
+        content="RentFlow — Smart Rent Collection & Automated Reminders"
+      />
+      <meta
+        property="og:description"
+        content="Automate rent reminders, track payments, and manage tenants effortlessly. Join 3,000+ landlords who trust RentFlow."
+      />
+      <meta property="og:url" content="https://rentflow.app/" />
+      <meta
+        property="og:image"
+        content="https://rentflow.app/og-image.png"
+      />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:locale" content="en_IN" />
+ 
+      {/* ── Twitter Card ── */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content="@rentflow" />
+      <meta
+        name="twitter:title"
+        content="RentFlow — Smart Rent Collection & Automated Reminders"
+      />
+      <meta
+        name="twitter:description"
+        content="Automate rent reminders, track payments, and manage tenants effortlessly. Join 3,000+ landlords who trust RentFlow."
+      />
+      <meta
+        name="twitter:image"
+        content="https://rentflow.app/og-image.png"
+      />
+ 
+      {/* ── Structured Data (JSON-LD) ── */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: "RentFlow",
+          applicationCategory: "BusinessApplication",
+          operatingSystem: "Web",
+          description:
+            "RentFlow helps landlords automate rent reminders, track payments, and manage tenants from one powerful dashboard.",
+          url: "https://rentflow.app",
+          offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "INR",
+            description: "Free plan available",
+          },
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: "4.8",
+            reviewCount: "3000",
+          },
+        })}
+      </script>
+    </Helmet>
+  );
+}
 
 function useScrollReveal() {
   useEffect(() => {
@@ -49,8 +132,8 @@ function Navbar() {
         </ul>
 
         <div className="navbar__cta">
-          <a href="#" className="btn btn--ghost">Sign In</a>
-          <a href="#" className="btn btn--primary">Get Started</a>
+          <a href="/login" className="btn btn--ghost">Sign In</a>
+          <a href="/signup" className="btn btn--primary">Get Started</a>
         </div>
 
         <button className="navbar__hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
@@ -85,7 +168,7 @@ function Hero() {
             effortlessly — all from one powerful dashboard.
           </p>
           <div className="hero__actions">
-            <a href="#" className="btn btn--primary btn--lg">
+            <a href="/signup" className="btn btn--primary btn--lg">
               Get Started Free
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
@@ -115,7 +198,7 @@ function Hero() {
             <div className="dashboard-card__body">
               <div className="dc-stat-row">
                 <div className="dc-stat">
-                  <span className="dc-stat__val">$24,800</span>
+                  <span className="dc-stat__val"> ₹24,800</span>
                   <span className="dc-stat__label">Monthly Revenue</span>
                   <span className="dc-stat__change up">↑ 12%</span>
                 </div>
@@ -290,7 +373,7 @@ function Benefits() {
             Whether you manage 2 units or 200, RentFlow adapts to your workflow and
             makes rent collection seamless, professional, and stress-free.
           </p>
-          <a href="#" className="btn btn--primary btn--lg">Start Free Today</a>
+          <a href="/signup" className="btn btn--primary btn--lg">Start Free Today</a>
           <div className="benefits__stats">
             <div className="benefit-stat">
               <span className="benefit-stat__val">87%</span>
@@ -330,7 +413,7 @@ function CTA() {
         <h2>Start Managing Your Rent <br /><span>Smarter Today</span></h2>
         <p>Join thousands of landlords who've already simplified their rent collection workflow.</p>
         <div className="cta-actions">
-          <a href="#" className="btn btn--white btn--lg">
+          <a href="/signup" className="btn btn--white btn--lg">
             Get Started Now
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
@@ -373,8 +456,8 @@ function Footer() {
         </div>
         <div className="footer__col">
           <h5>Legal</h5>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
           <a href="#">Cookie Policy</a>
         </div>
         <div className="footer__col footer__newsletter">
@@ -402,9 +485,11 @@ function Footer() {
 }
 
 export default function LandingPage() {
+  
   useScrollReveal();
   return (
     <div className="landing-root">
+       <SEO />
       <Navbar />
       <Hero />
       <Features />

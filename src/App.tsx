@@ -7,6 +7,8 @@ import LoginPage from './auth/LoginPage.jsx';
 import SignupPage from "./auth/SignupPage.jsx";
 import Dashboard from "./Dashboard/Dashboard.tsx";
 import RenterDetails from "./Dashboard/components/RenterDetail.tsx";
+import PrivacyPolicy from "./pages/Privacypolicy.jsx";
+import TermsOfService from "./pages/Termsofservice.jsx";
 
 
 export default function App() {
@@ -17,7 +19,9 @@ export default function App() {
         <Route path="/login"   element={<LoginPage />} />
         <Route path="/signup"  element={<SignupPage />} />
         <Route path="/Dashboard" element={<Dashboard />} />
-        <Route path="/Dashboard/Renter/:id" element={<RenterDetails />} />
+        <Route path="/Dashboard/Renter/:id/:ownerId" element={<RenterDetails />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
       </Routes>
     </BrowserRouter>
   );
